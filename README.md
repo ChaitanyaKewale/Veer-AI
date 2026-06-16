@@ -3,6 +3,7 @@
 **AI-powered Defence Preparation Chatbot** for NDA, CDS, AFCAT, Agniveer, TES, SSB, Indian Army, Navy & Air Force aspirants.
 
 ---
+Developer: Chaitanya Kewale INTERN ID - CITS1513
 
 ## 🚀 HOW TO RUN (Step-by-Step)
 
