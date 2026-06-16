@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}SSB Interview Simulator - VeerAI{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>🎖️ SSB Interview Simulator</h1>
+    <p>Practice SSB Interview with AI — Personal, Defence, Situational Questions</p>
+</div>
+
+<div class="ssb-container">
+    <div class="ssb-sidebar">
+        <div class="ssb-stages">
+            <div class="stage-title">Interview Stages</div>
+            <button class="stage-btn active" onclick="setStage('personal')" id="btn-personal">👤 Personal Interview</button>
+            <button class="stage-btn" onclick="setStage('defence')" id="btn-defence">🏛️ Defence Awareness</button>
+            <button class="stage-btn" onclick="setStage('current_affairs')" id="btn-current_affairs">📰 Current Affairs</button>
+            <button class="stage-btn" onclick="setStage('situation')" id="btn-situation">⚡ Situation Based</button>
+        </div>
+        <div class="ssb-tips">
+            <div class="tip-title">💡 SSB Tips</div>
+            <ul class="tips-list">
+                <li>Be genuine and consistent</li>
+                <li>Show initiative in answers</li>
+                <li>Use specific examples</li>
+                <li>Stay calm under pressure</li>
+                <li>Demonstrate leadership</li>
+                <li>Express yourself clearly</li>
+            </ul>
+        </div>
+        <div class="interview-score-box" id="scoreBox" style="display:none">
+            <div class="score-title">Session Score</div>
+            <div class="score-display" id="sessionScore">0/0</div>
+        </div>
+    </div>
+
+    <div class="ssb-main">
+        <div class="interviewer-panel">
+            <div class="io-avatar">🎗️</div>
+            <div class="io-info">
+                <div class="io-name">Interviewing Officer</div>
+                <div class="io-rank">Services Selection Board</div>
+            </div>
+        </div>
+
+        <div class="question-display" id="questionDisplay">
+            <div class="question-label">Question:</div>
+            <div class="question-text" id="questionText">Click "New Question" to begin your SSB interview simulation.</div>
+        </div>
+
+        <div class="answer-section">
+            <label>Your Answer:</label>
+            <textarea id="answerInput" class="answer-textarea" 
+                      placeholder="Type your answer here... Be confident, specific, and genuine."></textarea>
+        </div>
+
+        <div class="ssb-actions">
+            <button class="btn btn-primary" onclick="getNewQuestion()">📋 New Question</button>
+            <button class="btn btn-success" onclick="submitAnswer()">✅ Get Feedback</button>
+            <button class="btn btn-outline" onclick="clearAnswer()">🗑️ Clear</button>
+        </div>
+
+        <div class="feedback-panel" id="feedbackPanel" style="display:none">
+            <div class="feedback-title">🎯 IO Feedback</div>
+            <div class="feedback-text" id="feedbackText"></div>
+            <div class="feedback-score" id="feedbackScore"></div>
+        </div>
+
+        <div class="ssb-day-guide">
+            <h3>📅 SSB 5-Day Schedule</h3>
+            <div class="day-cards">
+                <div class="day-card">
+                    <div class="day-num">Day 1</div>
+                    <div class="day-name">Screening</div>
+                    <div class="day-desc">OIR Test + PPDT</div>
+                </div>
+                <div class="day-card">
+                    <div class="day-num">Day 2</div>
+                    <div class="day-name">Psychology</div>
+                    <div class="day-desc">TAT + WAT + SRT + SDT</div>
+                </div>
+                <div class="day-card">
+                    <div class="day-num">Day 3</div>
+                    <div class="day-name">GTO-1</div>
+                    <div class="day-desc">GD + GPE + PGT + HGT</div>
+                </div>
+                <div class="day-card">
+                    <div class="day-num">Day 4</div>
+                    <div class="day-name">GTO-2 + IO</div>
+                    <div class="day-desc">Obstacles + Command Task + Interview</div>
+                </div>
+                <div class="day-card">
+                    <div class="day-num">Day 5</div>
+                    <div class="day-name">Conference</div>
+                    <div class="day-desc">Final Board Decision</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+let currentStage = 'personal';
+let totalQuestions = 0;
+let totalScore = 0;
+
+function setStage(stage) {
+    currentStage = stage;
+    document.querySelectorAll('.stage-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-' + stage).classList.add('active');
+    document.getElementById('questionText').textContent = 'Click "New Question" to start ' + stage + ' questions.';
+    document.getElementById('feedbackPanel').style.display = 'none';
+}
+
+function getNewQuestion() {
+    fetch(`/api/ssb/question?stage=${currentStage}`)
+        .then(r => r.json())
+        .then(data => {
+            document.getElementById('questionText').textContent = data.question;
+            document.getElementById('answerInput').value = '';
+            document.getElementById('feedbackPanel').style.display = 'none';
+        });
+}
+
+function submitAnswer() {
+    const answer = document.getElementById('answerInput').value.trim();
+    if (!answer) { alert('Please write your answer first!'); return; }
+
+    fetch('/api/ssb/feedback', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({answer: answer, stage: currentStage})
+    })
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById('feedbackText').textContent = data.feedback;
+        document.getElementById('feedbackScore').innerHTML = `Score: <strong>${data.score}/10</strong>`;
+        document.getElementById('feedbackPanel').style.display = 'block';
+        totalQuestions++;
+        totalScore += data.score;
+        document.getElementById('scoreBox').style.display = 'block';
+        document.getElementById('sessionScore').textContent = `${totalScore}/${totalQuestions * 10}`;
+    });
+}
+
+function clearAnswer() {
+    document.getElementById('answerInput').value = '';
+    document.getElementById('feedbackPanel').style.display = 'none';
+}
+</script>
+{% endblock %}

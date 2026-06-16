@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block title %}OLQ Analyzer - VeerAI{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>🧠 OLQ Analyzer</h1>
+    <p>Assess your Officer Like Qualities across all parameters</p>
+</div>
+
+<div class="olq-container">
+    <div class="olq-intro">
+        <div class="olq-info-card">
+            <h3>What are Officer Like Qualities (OLQs)?</h3>
+            <p>SSB evaluates 15 OLQs grouped under Effective Intelligence, Social Adaptability, Dynamic Qualities, and Social Effectiveness. This assessment gives you a baseline of your current OLQ profile.</p>
+        </div>
+    </div>
+
+    <div id="olqQuestionnaire">
+        <div class="olq-form" id="olqForm">
+            <!-- Questions loaded by JS -->
+        </div>
+        <button class="btn btn-primary btn-lg" onclick="submitOLQ()" id="olqSubmitBtn" style="display:none; margin: 2rem auto; display:block; width: fit-content;">
+            🔍 Analyze My OLQs
+        </button>
+    </div>
+
+    <div id="olqResults" style="display:none">
+        <div class="olq-report">
+            <div class="report-header">
+                <h2>🎖️ Your OLQ Assessment Report</h2>
+                <div class="overall-score" id="overallScore"></div>
+                <div class="recommendation" id="recommendation"></div>
+            </div>
+
+            <div class="olq-scores-grid" id="olqScoresGrid"></div>
+
+            <div class="report-sections">
+                <div class="report-box strengths-box">
+                    <h3>✅ Your Strengths</h3>
+                    <div id="strengthsList"></div>
+                </div>
+                <div class="report-box improve-box">
+                    <h3>📈 Areas to Improve</h3>
+                    <div id="improveList"></div>
+                </div>
+            </div>
+
+            <div class="olq-advice">
+                <h3>💡 How to Develop OLQs</h3>
+                <div class="advice-grid">
+                    <div class="advice-card">
+                        <strong>Leadership</strong>
+                        <p>Take initiative in group activities, participate in NCC, lead college events, practice group discussions.</p>
+                    </div>
+                    <div class="advice-card">
+                        <strong>Communication</strong>
+                        <p>Join debate/elocution clubs, practice extempore speaking, read aloud daily, learn to express ideas clearly.</p>
+                    </div>
+                    <div class="advice-card">
+                        <strong>Self Confidence</strong>
+                        <p>Set and achieve small goals, take on challenges, avoid overthinking, maintain good physical fitness.</p>
+                    </div>
+                    <div class="advice-card">
+                        <strong>Team Spirit</strong>
+                        <p>Participate in team sports, volunteer for group projects, learn to value others' contributions.</p>
+                    </div>
+                    <div class="advice-card">
+                        <strong>Initiative</strong>
+                        <p>Don't wait to be told — act first. Start projects, help others without being asked, solve problems proactively.</p>
+                    </div>
+                    <div class="advice-card">
+                        <strong>Responsibility</strong>
+                        <p>Accept accountability for mistakes, follow through on commitments, be reliable in all roles.</p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-outline" onclick="retakeOLQ()" style="margin-top: 1.5rem">🔄 Retake Assessment</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+let olqQuestions = [];
+let answers = [];
+
+fetch('/api/olq')
+    .then(r => r.json())
+    .then(data => {
+        olqQuestions = data.questions;
+        renderQuestions();
+    });
+
+function renderQuestions() {
+    const form = document.getElementById('olqForm');
+    form.innerHTML = '';
+    olqQuestions.forEach((q, i) => {
+        const card = document.createElement('div');
+        card.className = 'olq-question-card';
+        card.innerHTML = `
+            <div class="q-num">Q${i+1}</div>
+            <div class="q-text">${q.q}</div>
+            <div class="q-trait">Assessing: <strong>${q.trait.replace('_', ' ')}</strong></div>
+            <div class="olq-options">
+                ${q.opts.map((opt, j) => `
+                    <label class="olq-option">
+                        <input type="radio" name="olq_${i}" value="${j}" onchange="recordAnswer(${i}, ${j})">
+                        <span class="olq-opt-text">${opt}</span>
+                    </label>
+                `).join('')}
+            </div>
+        `;
+        form.appendChild(card);
+    });
+    answers = new Array(olqQuestions.length).fill(-1);
+    document.getElementById('olqSubmitBtn').style.display = 'block';
+}
+
+function recordAnswer(qIndex, answerIndex) {
+    answers[qIndex] = answerIndex;
+}
+
+function submitOLQ() {
+    if (answers.some(a => a === -1)) {
+        alert('Please answer all questions before submitting.');
+        return;
+    }
+    fetch('/api/olq/analyze', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({answers: answers})
+    })
+    .then(r => r.json())
+    .then(report => {
+        displayReport(report);
+    });
+}
+
+function displayReport(report) {
+    document.getElementById('olqQuestionnaire').style.display = 'none';
+    document.getElementById('olqResults').style.display = 'block';
+
+    document.getElementById('overallScore').innerHTML = `Average Score: <strong>${report.average}/10</strong>`;
+    document.getElementById('recommendation').innerHTML = `
+        <span class="rec-badge ${report.recommendation === 'Recommended' ? 'rec-yes' : 'rec-no'}">
+            ${report.recommendation === 'Recommended' ? '✅ Recommended Profile' : '⚠️ Needs Development'}
+        </span>
+    `;
+
+    const grid = document.getElementById('olqScoresGrid');
+    grid.innerHTML = '';
+    for (const [trait, score] of Object.entries(report.scores)) {
+        const color = score >= 7 ? '#4CAF50' : score >= 5 ? '#FF9800' : '#F44336';
+        grid.innerHTML += `
+            <div class="score-item">
+                <div class="score-label">${trait.replace('_', ' ')}</div>
+                <div class="score-bar-bg"><div class="score-bar-fill" style="width:${score*10}%; background:${color}"></div></div>
+                <div class="score-val">${score}/10</div>
+            </div>
+        `;
+    }
+
+    const strengthsList = document.getElementById('strengthsList');
+    if (report.strengths.length) {
+        strengthsList.innerHTML = report.strengths.map(s => `<div class="tag green-tag">✅ ${s.replace('_', ' ')}</div>`).join('');
+    } else {
+        strengthsList.innerHTML = '<p>Keep developing all areas!</p>';
+    }
+
+    const improveList = document.getElementById('improveList');
+    if (report.improvements.length) {
+        improveList.innerHTML = report.improvements.map(s => `<div class="tag red-tag">📈 ${s.replace('_', ' ')}</div>`).join('');
+    } else {
+        improveList.innerHTML = '<p>Great profile! All areas are above average!</p>';
+    }
+}
+
+function retakeOLQ() {
+    document.getElementById('olqResults').style.display = 'none';
+    document.getElementById('olqQuestionnaire').style.display = 'block';
+    renderQuestions();
+}
+</script>
+{% endblock %}

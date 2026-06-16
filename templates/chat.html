@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}VeerAI Chat - Defence AI Mentor{% endblock %}
+{% block content %}
+
+<div class="chat-page">
+    <div class="chat-sidebar">
+        <div class="sidebar-title">Quick Topics</div>
+        <div class="topic-btns">
+            <button class="topic-btn" onclick="askTopic('What is NDA exam?')">📚 NDA</button>
+            <button class="topic-btn" onclick="askTopic('Tell me about CDS exam')">📋 CDS</button>
+            <button class="topic-btn" onclick="askTopic('What is AFCAT?')">✈️ AFCAT</button>
+            <button class="topic-btn" onclick="askTopic('Explain Agniveer scheme')">🪖 Agniveer</button>
+            <button class="topic-btn" onclick="askTopic('How to prepare for SSB interview?')">🎖️ SSB Prep</button>
+            <button class="topic-btn" onclick="askTopic('What are Officer Like Qualities?')">🏅 OLQs</button>
+            <button class="topic-btn" onclick="askTopic('Indian Army ranks')">⭐ Army Ranks</button>
+            <button class="topic-btn" onclick="askTopic('Tell me about BrahMos missile')">🚀 BrahMos</button>
+            <button class="topic-btn" onclick="askTopic('What is Operation Sindoor?')">⚡ Op Sindoor</button>
+            <button class="topic-btn" onclick="askTopic('Fitness tips for defence aspirants')">💪 Fitness</button>
+            <button class="topic-btn" onclick="askTopic('INS Vikrant aircraft carrier')">🚢 Navy Ships</button>
+            <button class="topic-btn" onclick="askTopic('How to join Indian Air Force?')">✈️ IAF Career</button>
+        </div>
+        <div class="sidebar-info">
+            <div class="info-box">
+                <strong>🎯 Tip:</strong> Ask specific questions for better answers. Example: "What is the NDA exam pattern?" or "How many OLQs are assessed in SSB?"
+            </div>
+        </div>
+    </div>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="chat-avatar">⚔️</div>
+            <div class="chat-header-info">
+                <div class="chat-name">VeerAI</div>
+                <div class="chat-status">🟢 Online — Defence Mentor</div>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                <div class="msg-avatar">⚔️</div>
+                <div class="msg-bubble">
+                    <p><strong>Jai Hind! Welcome to VeerAI 🎖️</strong></p>
+                    <p>I'm your AI-powered Defence Preparation Mentor. I can help you with:</p>
+                    <ul>
+                        <li>📚 Exam preparation: NDA, CDS, AFCAT, Agniveer</li>
+                        <li>🎖️ SSB Interview guidance and OLQ assessment</li>
+                        <li>🏛️ Indian Army, Navy, and Air Force knowledge</li>
+                        <li>📰 Defence current affairs and operations</li>
+                        <li>💪 Fitness guidance and BMI assessment</li>
+                        <li>🗺️ Career path and entry routes</li>
+                    </ul>
+                    <p>What would you like to know today?</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" class="chat-input" 
+                   placeholder="Ask me about NDA, CDS, SSB, defence knowledge..." 
+                   onkeypress="handleEnter(event)">
+            <button class="send-btn" onclick="sendMessage()">Send ➤</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+    addMessage(msg, 'user');
+    input.value = '';
+    showTyping();
+    fetch('/api/chat', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message: msg})
+    })
+    .then(r => r.json())
+    .then(data => {
+        removeTyping();
+        addMessage(data.response, 'bot');
+    })
+    .catch(() => {
+        removeTyping();
+        addMessage('Connection error. Please try again.', 'bot');
+    });
+}
+
+function addMessage(text, sender) {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = `message ${sender}-message`;
+    const avatar = sender === 'bot' ? '⚔️' : '👤';
+    div.innerHTML = `
+        <div class="msg-avatar">${avatar}</div>
+        <div class="msg-bubble">${text.replace(/\n/g, '<br>')}</div>
+    `;
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+
+function showTyping() {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = 'message bot-message typing-indicator';
+    div.id = 'typingIndicator';
+    div.innerHTML = '<div class="msg-avatar">⚔️</div><div class="msg-bubble"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>';
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+}
+
+function removeTyping() {
+    const el = document.getElementById('typingIndicator');
+    if (el) el.remove();
+}
+
+function askTopic(topic) {
+    document.getElementById('chatInput').value = topic;
+    sendMessage();
+}
+
+function handleEnter(e) {
+    if (e.key === 'Enter') sendMessage();
+}
+</script>
+{% endblock %}

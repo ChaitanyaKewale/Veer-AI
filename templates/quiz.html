@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}Defence Quiz - VeerAI{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>📋 Daily Defence Quiz</h1>
+    <p>Test your knowledge — NDA, CDS, AFCAT, Defence GK, Current Affairs</p>
+</div>
+
+<div class="quiz-page">
+    <div class="quiz-categories">
+        <button class="cat-btn active" onclick="selectCat('Defence')" id="cat-Defence">🏛️ Defence GK</button>
+        <button class="cat-btn" onclick="selectCat('NDA')" id="cat-NDA">📚 NDA</button>
+        <button class="cat-btn" onclick="selectCat('CDS')" id="cat-CDS">📋 CDS</button>
+        <button class="cat-btn" onclick="selectCat('SSB')" id="cat-SSB">🎖️ SSB</button>
+        <button class="cat-btn" onclick="selectCat('CurrentAffairs')" id="cat-CurrentAffairs">📰 Current Affairs</button>
+    </div>
+
+    <div class="quiz-area" id="quizStart">
+        <div class="quiz-start-card">
+            <div class="quiz-icon">🏆</div>
+            <h2>Ready to Test Your Knowledge?</h2>
+            <p>Select a category above and click Start Quiz. Each quiz has 5 questions.</p>
+            <button class="btn btn-primary btn-lg" onclick="startQuiz()">🚀 Start Quiz</button>
+        </div>
+    </div>
+
+    <div class="quiz-area" id="quizActive" style="display:none">
+        <div class="quiz-progress">
+            <span id="progressText">Question 1 of 5</span>
+            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+        <div class="question-card">
+            <div class="q-number" id="qNumber">Q1</div>
+            <div class="q-text" id="qText">Loading question...</div>
+            <div class="options-grid" id="optionsGrid"></div>
+        </div>
+        <div class="quiz-feedback" id="quizFeedback" style="display:none"></div>
+        <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none; margin-top:1rem">Next Question →</button>
+    </div>
+
+    <div class="quiz-area" id="quizResult" style="display:none">
+        <div class="result-card">
+            <div class="result-icon" id="resultIcon">🏆</div>
+            <h2 id="resultTitle">Quiz Complete!</h2>
+            <div class="result-score" id="resultScore">0/5</div>
+            <div class="result-percentage" id="resultPercentage">0%</div>
+            <div class="result-message" id="resultMessage"></div>
+            <div class="result-actions">
+                <button class="btn btn-primary" onclick="startQuiz()">🔄 Try Again</button>
+                <button class="btn btn-outline" onclick="resetCategory()">📋 Change Category</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+let selectedCategory = 'Defence';
+let questions = [];
+let currentQ = 0;
+let score = 0;
+let answered = false;
+
+function selectCat(cat) {
+    selectedCategory = cat;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('cat-' + cat).classList.add('active');
+}
+
+function startQuiz() {
+    fetch(`/api/quiz?category=${selectedCategory}&num=5`)
+        .then(r => r.json())
+        .then(data => {
+            questions = data.questions;
+            currentQ = 0;
+            score = 0;
+            answered = false;
+            document.getElementById('quizStart').style.display = 'none';
+            document.getElementById('quizResult').style.display = 'none';
+            document.getElementById('quizActive').style.display = 'block';
+            showQuestion();
+        });
+}
+
+function showQuestion() {
+    answered = false;
+    const q = questions[currentQ];
+    document.getElementById('qNumber').textContent = `Q${currentQ + 1}`;
+    document.getElementById('qText').textContent = q.q;
+    document.getElementById('progressText').textContent = `Question ${currentQ + 1} of ${questions.length}`;
+    document.getElementById('progressFill').style.width = `${((currentQ) / questions.length) * 100}%`;
+    document.getElementById('quizFeedback').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+
+    const grid = document.getElementById('optionsGrid');
+    grid.innerHTML = '';
+    q.options.forEach((opt, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = `${String.fromCharCode(65+i)}. ${opt}`;
+        btn.onclick = () => selectAnswer(i, q.ans, btn);
+        grid.appendChild(btn);
+    });
+}
+
+function selectAnswer(selected, correct, btn) {
+    if (answered) return;
+    answered = true;
+    const allBtns = document.querySelectorAll('.option-btn');
+    allBtns.forEach((b, i) => {
+        b.disabled = true;
+        if (i === correct) b.classList.add('correct');
+        else if (i === selected && selected !== correct) b.classList.add('wrong');
+    });
+
+    const fb = document.getElementById('quizFeedback');
+    if (selected === correct) {
+        score++;
+        fb.innerHTML = '✅ Correct! Well done!';
+        fb.className = 'quiz-feedback correct-fb';
+    } else {
+        fb.innerHTML = `❌ Incorrect. Correct answer: <strong>${questions[currentQ].options[correct]}</strong>`;
+        fb.className = 'quiz-feedback wrong-fb';
+    }
+    fb.style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'inline-block';
+
+    if (currentQ === questions.length - 1) {
+        document.getElementById('nextBtn').textContent = 'See Results 🏆';
+    }
+}
+
+function nextQuestion() {
+    currentQ++;
+    if (currentQ >= questions.length) {
+        showResult();
+    } else {
+        showQuestion();
+    }
+}
+
+function showResult() {
+    document.getElementById('quizActive').style.display = 'none';
+    document.getElementById('quizResult').style.display = 'block';
+    const pct = Math.round((score / questions.length) * 100);
+    document.getElementById('resultScore').textContent = `${score}/${questions.length}`;
+    document.getElementById('resultPercentage').textContent = `${pct}%`;
+
+    let icon, title, msg;
+    if (pct >= 80) { icon = '🏆'; title = 'Outstanding!'; msg = 'Excellent performance! You are well-prepared.'; }
+    else if (pct >= 60) { icon = '💪'; title = 'Good Job!'; msg = 'Good score! Keep practising to achieve excellence.'; }
+    else { icon = '📚'; title = 'Keep Studying!'; msg = 'Focus on weak areas. Revision is key to success.'; }
+
+    document.getElementById('resultIcon').textContent = icon;
+    document.getElementById('resultTitle').textContent = title;
+    document.getElementById('resultMessage').textContent = msg;
+
+    fetch('/api/quiz/submit', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({category: selectedCategory, score: score, total: questions.length})
+    });
+}
+
+function resetCategory() {
+    document.getElementById('quizResult').style.display = 'none';
+    document.getElementById('quizStart').style.display = 'block';
+}
+</script>
+{% endblock %}

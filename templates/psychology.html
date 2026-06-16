@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% block title %}Psychology Tests - VeerAI{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>🔬 Psychology Test Practice</h1>
+    <p>Practice WAT, SRT, and TAT — Core SSB Day 2 Tests</p>
+</div>
+
+<div class="psych-tabs">
+    <button class="psych-tab active" onclick="showTab('wat')" id="tab-wat">📝 WAT</button>
+    <button class="psych-tab" onclick="showTab('srt')" id="tab-srt">⚡ SRT</button>
+    <button class="psych-tab" onclick="showTab('tat')" id="tab-tat">📖 TAT</button>
+</div>
+
+<!-- WAT Section -->
+<div id="section-wat" class="psych-section">
+    <div class="test-info-banner">
+        <strong>WAT (Word Association Test)</strong> — In SSB, 60 words are shown at 15-second intervals. Write the first sentence that comes to your mind. Practice here with random words.
+    </div>
+    <div class="wat-container">
+        <div class="wat-timer" id="watTimer">⏱ 15</div>
+        <div class="wat-word" id="watWord">Click "Show Word" to begin</div>
+        <input type="text" id="watAnswer" class="wat-input" placeholder="Write your sentence here..." disabled>
+        <div class="wat-actions">
+            <button class="btn btn-primary" onclick="startWAT()" id="watStartBtn">▶ Show Word</button>
+            <button class="btn btn-success" onclick="submitWAT()" id="watSubmitBtn" style="display:none">✅ Submit</button>
+        </div>
+        <div class="wat-feedback" id="watFeedback" style="display:none"></div>
+        <div class="wat-examples">
+            <h4>💡 WAT Tips & Examples:</h4>
+            <table class="examples-table">
+                <tr><th>Word</th><th>Good Response ✅</th><th>Avoid ❌</th></tr>
+                <tr><td>Courage</td><td>The officer displayed great courage while rescuing civilians from flood.</td><td>Courage is important in life.</td></tr>
+                <tr><td>Team</td><td>Our team worked together to complete the mission ahead of schedule.</td><td>I like working in a team.</td></tr>
+                <tr><td>Challenge</td><td>He embraced every challenge as an opportunity to demonstrate his capability.</td><td>Life is full of challenges.</td></tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- SRT Section -->
+<div id="section-srt" class="psych-section" style="display:none">
+    <div class="test-info-banner">
+        <strong>SRT (Situation Reaction Test)</strong> — In SSB, 60 situations are given in 30 minutes. Write what YOU would do. Show initiative, responsibility, and care for others.
+    </div>
+    <div class="srt-container">
+        <div class="situation-box" id="srtSituation">
+            Click "Get Situation" to start practicing SRT.
+        </div>
+        <div class="srt-timer-row">
+            <span>You have 30 seconds to respond:</span>
+            <span class="srt-timer" id="srtTimer">⏱ 30</span>
+        </div>
+        <textarea id="srtAnswer" class="srt-textarea" placeholder="What would you do? (Write your immediate action steps...)"></textarea>
+        <div class="srt-actions">
+            <button class="btn btn-primary" onclick="getSRT()">⚡ Get Situation</button>
+            <button class="btn btn-success" onclick="submitSRT()">✅ Evaluate</button>
+        </div>
+        <div class="srt-feedback" id="srtFeedback" style="display:none"></div>
+        <div class="srt-guide">
+            <h4>💡 SRT Formula:</h4>
+            <p>✅ <strong>Action → Care for others → Inform/Escalate → Follow through</strong></p>
+            <p>Example: "Accident on road → Called 112 → Gave first aid → Managed traffic → Ensured victim reached hospital"</p>
+        </div>
+    </div>
+</div>
+
+<!-- TAT Section -->
+<div id="section-tat" class="psych-section" style="display:none">
+    <div class="test-info-banner">
+        <strong>TAT (Thematic Apperception Test)</strong> — In SSB, 12 pictures are shown for 30 seconds each. Write a story in 4 minutes. Practice with situation descriptions here.
+    </div>
+    <div class="tat-container">
+        <div class="tat-situation-box" id="tatSituation">
+            Click "Get Picture Situation" to start TAT practice.
+        </div>
+        <div class="tat-timer-row">
+            <div class="tat-timer-info">Time: <span class="tat-timer" id="tatTimer">4:00</span></div>
+            <div class="word-count">Words: <span id="wordCount">0</span></div>
+        </div>
+        <textarea id="tatStory" class="tat-textarea" placeholder="Write your story here...&#10;&#10;Include: Background → Character thoughts/feelings → Action taken → Positive outcome" oninput="countWords()"></textarea>
+        <div class="tat-actions">
+            <button class="btn btn-primary" onclick="getTAT()">📖 Get Picture Situation</button>
+            <button class="btn btn-success" onclick="submitTAT()">✅ Get Feedback</button>
+        </div>
+        <div class="tat-feedback" id="tatFeedback" style="display:none"></div>
+        <div class="tat-guide">
+            <h4>💡 TAT Story Structure:</h4>
+            <p>1. <strong>Background</strong>: Set the scene (2-3 lines)</p>
+            <p>2. <strong>Thoughts/Feelings</strong>: What is the hero thinking? (2-3 lines)</p>
+            <p>3. <strong>Action</strong>: What does the hero do? (3-4 lines, show initiative!)</p>
+            <p>4. <strong>Outcome</strong>: Positive result (2-3 lines)</p>
+            <p>✅ Aim for 12-15 lines. Positive theme. One hero. Leadership shown.</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+let watInterval, srtInterval, tatInterval;
+let watTimeLeft = 15, srtTimeLeft = 30, tatTimeLeft = 240;
+let watRunning = false;
+
+function showTab(tab) {
+    ['wat', 'srt', 'tat'].forEach(t => {
+        document.getElementById('section-' + t).style.display = 'none';
+        document.getElementById('tab-' + t).classList.remove('active');
+    });
+    document.getElementById('section-' + tab).style.display = 'block';
+    document.getElementById('tab-' + tab).classList.add('active');
+    clearAllTimers();
+}
+
+function clearAllTimers() {
+    clearInterval(watInterval);
+    clearInterval(srtInterval);
+    clearInterval(tatInterval);
+}
+
+// WAT
+function startWAT() {
+    fetch('/api/wat').then(r => r.json()).then(data => {
+        document.getElementById('watWord').textContent = data.word;
+        document.getElementById('watAnswer').disabled = false;
+        document.getElementById('watAnswer').value = '';
+        document.getElementById('watFeedback').style.display = 'none';
+        document.getElementById('watStartBtn').style.display = 'none';
+        document.getElementById('watSubmitBtn').style.display = 'inline-block';
+        watTimeLeft = 15;
+        document.getElementById('watTimer').textContent = '⏱ ' + watTimeLeft;
+        watInterval = setInterval(() => {
+            watTimeLeft--;
+            document.getElementById('watTimer').textContent = '⏱ ' + watTimeLeft;
+            if (watTimeLeft <= 0) {
+                clearInterval(watInterval);
+                submitWAT();
+            }
+        }, 1000);
+    });
+}
+
+function submitWAT() {
+    clearInterval(watInterval);
+    const answer = document.getElementById('watAnswer').value.trim();
+    const fb = document.getElementById('watFeedback');
+    if (!answer) {
+        fb.innerHTML = '⚠️ No sentence written. In SSB, always write something — even an imperfect sentence is better than blank.';
+        fb.className = 'wat-feedback warn-fb';
+    } else {
+        const positive = ['team', 'help', 'lead', 'achiev', 'success', 'respon', 'initia', 'courage', 'duty', 'nation', 'officer', 'service'].some(w => answer.toLowerCase().includes(w));
+        const action = answer.includes('ed') || answer.includes('ing');
+        let tips = [];
+        if (positive) tips.push('✅ Good positive/officer-like content!');
+        else tips.push('💡 Add officer-like values: leadership, initiative, responsibility.');
+        if (action) tips.push('✅ Action-oriented language used!');
+        else tips.push('💡 Use action verbs to show dynamism.');
+        if (answer.length > 80) tips.push('⚠️ Keep sentences concise (under 15 words ideally).');
+        fb.innerHTML = tips.join('<br>');
+        fb.className = 'wat-feedback';
+    }
+    fb.style.display = 'block';
+    document.getElementById('watStartBtn').style.display = 'inline-block';
+    document.getElementById('watSubmitBtn').style.display = 'none';
+    document.getElementById('watAnswer').disabled = true;
+}
+
+// SRT
+function getSRT() {
+    fetch('/api/srt').then(r => r.json()).then(data => {
+        document.getElementById('srtSituation').textContent = data.situation;
+        document.getElementById('srtAnswer').value = '';
+        document.getElementById('srtFeedback').style.display = 'none';
+        clearInterval(srtInterval);
+        srtTimeLeft = 30;
+        document.getElementById('srtTimer').textContent = '⏱ ' + srtTimeLeft;
+        srtInterval = setInterval(() => {
+            srtTimeLeft--;
+            document.getElementById('srtTimer').textContent = '⏱ ' + srtTimeLeft;
+            if (srtTimeLeft <= 0) { clearInterval(srtInterval); document.getElementById('srtTimer').textContent = '⏱ Time Up!'; }
+        }, 1000);
+    });
+}
+
+function submitSRT() {
+    clearInterval(srtInterval);
+    const answer = document.getElementById('srtAnswer').value.trim();
+    const fb = document.getElementById('srtFeedback');
+    if (!answer) { fb.innerHTML = '⚠️ Please write your response!'; fb.style.display = 'block'; return; }
+    const actionWords = ['call', 'inform', 'help', 'assist', 'organise', 'organize', 'lead', 'gather', 'took', 'rush', 'ensur', 'contact'];
+    const hasAction = actionWords.some(w => answer.toLowerCase().includes(w));
+    let feedback = '';
+    if (hasAction) feedback += '✅ Good! You showed concrete action. ';
+    else feedback += '💡 Show more concrete action steps (e.g., called 112, organized team, informed senior). ';
+    const careWords = ['people', 'victim', 'others', 'colleague', 'team', 'help', 'assist'];
+    if (careWords.some(w => answer.toLowerCase().includes(w))) feedback += '✅ Good care for others shown! ';
+    else feedback += '💡 Show care for people involved in the situation. ';
+    fb.innerHTML = feedback;
+    fb.style.display = 'block';
+}
+
+// TAT
+function getTAT() {
+    fetch('/api/tat').then(r => r.json()).then(data => {
+        document.getElementById('tatSituation').textContent = data.situation;
+        document.getElementById('tatStory').value = '';
+        document.getElementById('tatFeedback').style.display = 'none';
+        document.getElementById('wordCount').textContent = '0';
+        clearInterval(tatInterval);
+        tatTimeLeft = 240;
+        updateTATTimer();
+        tatInterval = setInterval(() => {
+            tatTimeLeft--;
+            updateTATTimer();
+            if (tatTimeLeft <= 0) { clearInterval(tatInterval); }
+        }, 1000);
+    });
+}
+
+function updateTATTimer() {
+    const m = Math.floor(tatTimeLeft / 60);
+    const s = tatTimeLeft % 60;
+    document.getElementById('tatTimer').textContent = `${m}:${s.toString().padStart(2,'0')}`;
+}
+
+function countWords() {
+    const words = document.getElementById('tatStory').value.trim().split(/\s+/).filter(w => w).length;
+    document.getElementById('wordCount').textContent = words;
+}
+
+function submitTAT() {
+    clearInterval(tatInterval);
+    const story = document.getElementById('tatStory').value.trim();
+    const fb = document.getElementById('tatFeedback');
+    if (!story) { fb.innerHTML = '⚠️ Please write your story!'; fb.style.display = 'block'; return; }
+    const words = story.split(/\s+/).filter(w => w).length;
+    let tips = [];
+    if (words < 60) tips.push('⚠️ Story too short. Aim for 100-150 words (12-15 lines in SSB).');
+    else if (words > 200) tips.push('⚠️ Story may be too long. Aim for 100-150 words.');
+    else tips.push('✅ Good story length!');
+    const leaderWords = ['lead', 'took charge', 'organis', 'decided', 'command', 'ensur', 'helped', 'saved'];
+    if (leaderWords.some(w => story.toLowerCase().includes(w))) tips.push('✅ Leadership/initiative shown!');
+    else tips.push('💡 Show your hero taking initiative and leadership.');
+    const negWords = ['failed', 'died', 'killed', 'lost', 'depressed', 'suicide', 'murder', 'crime', 'accident ended'];
+    if (negWords.some(w => story.toLowerCase().includes(w))) tips.push('⚠️ Avoid very negative endings. End positively.');
+    else tips.push('✅ Positive theme maintained!');
+    fb.innerHTML = tips.join('<br>');
+    fb.style.display = 'block';
+}
+</script>
+{% endblock %}

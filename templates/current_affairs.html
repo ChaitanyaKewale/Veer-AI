@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Defence Current Affairs - VeerAI{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>📰 Defence Current Affairs</h1>
+    <p>Latest military operations, exercises, procurement, and defence policy updates</p>
+</div>
+
+<div class="affairs-page">
+    <div class="affairs-filters">
+        <button class="filter-btn active" onclick="filterAffairs(null, this)">All</button>
+        <button class="filter-btn" onclick="filterAffairs('Operations', this)">⚡ Operations</button>
+        <button class="filter-btn" onclick="filterAffairs('Exercises', this)">🪖 Exercises</button>
+        <button class="filter-btn" onclick="filterAffairs('Procurement', this)">🛡️ Procurement</button>
+        <button class="filter-btn" onclick="filterAffairs('Technology', this)">🔬 Technology</button>
+        <button class="filter-btn" onclick="filterAffairs('Policy', this)">📋 Policy</button>
+        <button class="filter-btn" onclick="filterAffairs('Navy', this)">🚢 Navy</button>
+        <button class="filter-btn" onclick="filterAffairs('International', this)">🌐 International</button>
+    </div>
+
+    <div class="affairs-grid" id="affairsGrid">
+        <div class="loading">Loading current affairs...</div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+function loadAffairs(category = null) {
+    const url = category ? `/api/current_affairs?category=${category}` : '/api/current_affairs';
+    fetch(url).then(r => r.json()).then(data => {
+        const grid = document.getElementById('affairsGrid');
+        if (!data.affairs.length) {
+            grid.innerHTML = '<div class="no-data">No articles found for this category.</div>';
+            return;
+        }
+        grid.innerHTML = data.affairs.map(a => `
+            <div class="affair-card">
+                <div class="affair-category">${a.category}</div>
+                <div class="affair-date">${a.date}</div>
+                <h3 class="affair-title">${a.title}</h3>
+                <p class="affair-content">${a.content}</p>
+            </div>
+        `).join('');
+    });
+}
+
+function filterAffairs(category, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    loadAffairs(category);
+}
+
+loadAffairs();
+</script>
+{% endblock %}

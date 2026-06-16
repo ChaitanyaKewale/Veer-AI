@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}VeerAI - Defence Aspirant Mentor{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="nav-emblem">⚔️</span>
+            <span class="nav-title">VeerAI</span>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">🏠 Home</a>
+            <a href="/chat" class="nav-link">💬 Chat</a>
+            <a href="/ssb" class="nav-link">🎖️ SSB</a>
+            <a href="/quiz" class="nav-link">📋 Quiz</a>
+            <a href="/olq" class="nav-link">🧠 OLQ</a>
+            <a href="/psychology" class="nav-link">🔬 Psych</a>
+            <a href="/fitness" class="nav-link">💪 Fitness</a>
+            <a href="/current_affairs" class="nav-link">📰 News</a>
+            <a href="/career" class="nav-link">🗺️ Career</a>
+        </div>
+        <div class="nav-motto">Jai Hind 🇮🇳</div>
+    </nav>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>⚔️ VeerAI - Your Personal Defence Mentor | Prepared for India's Warriors 🇮🇳</p>
+        <p class="footer-sub">NDA • CDS • AFCAT • Agniveer • SSB • Indian Armed Forces</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

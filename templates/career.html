@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% block title %}Career Navigator - VeerAI{% endblock %}
+{% block content %}
+
+<div class="page-header">
+    <h1>🗺️ Defence Career Navigator</h1>
+    <p>Explore all entry routes to Indian Army, Navy, and Air Force</p>
+</div>
+
+<div class="career-page">
+    <div class="career-tabs">
+        <button class="career-tab active" onclick="showService('army')" id="tab-army">🪖 Indian Army</button>
+        <button class="career-tab" onclick="showService('navy')" id="tab-navy">🚢 Indian Navy</button>
+        <button class="career-tab" onclick="showService('airforce')" id="tab-airforce">✈️ Indian Air Force</button>
+    </div>
+
+    <!-- ARMY -->
+    <div id="service-army" class="service-section">
+        <div class="service-hero army-hero">
+            <h2>🪖 Indian Army — Entry Routes</h2>
+            <p>Serving since 1895 | 13 lakh+ active personnel</p>
+        </div>
+        <div class="entries-grid">
+            <div class="entry-card">
+                <div class="entry-name">NDA</div>
+                <div class="entry-detail"><strong>Eligibility:</strong> 10+2 pass, Age 16.5-19.5 yrs (Male/Female)</div>
+                <div class="entry-detail"><strong>Process:</strong> UPSC Exam → SSB → Medical</div>
+                <div class="entry-detail"><strong>Commission:</strong> Permanent Commission as Lieutenant</div>
+                <div class="entry-detail"><strong>Training:</strong> 3 yrs NDA + 1.5 yrs IMA</div>
+            </div>
+            <div class="entry-card">
+                <div class="entry-name">CDS IMA</div>
+                <div class="entry-detail"><strong>Eligibility:</strong> Graduate any stream, Age 19-24 yrs</div>
+                <div class="entry-detail"><strong>Process:</strong> UPSC CDS → SSB → Medical</div>
+                <div class="entry-detail"><strong>Commission:</strong> Permanent Commission as Lieutenant</div>
+                <div class="entry-detail"><strong>Training:</strong> 18 months at IMA, Dehradun</div>
+            </div>
+            <div class="entry-card">
+                <div class="entry-name">TES (Technical Entry Scheme)</div>
+                <div class="entry-detail"><strong>Eligibility:</strong> 10+2 PCM with 70%+, Age 16.5-19.5 yrs</div>
+                <div class="entry-detail"><strong>Process:</strong> SSB (no written exam)</div>
+                <div class="entry-detail"><strong>Commission:</strong> Permanent Commission</div>
+                <div class="entry-detail"><strong>Training:</strong> 5 years (B.Tech + Military training)</div>
+            </div>
+            <div class="entry-card">
+                <div class="entry-name">NCC Special Entry</div>
+                <div class="entry-detail"><strong>Eligibility:</strong> Graduate with NCC 'C' Certificate (Army Wing 'B' Grade)</div>
+                <div class="entry-detail"><strong>Process:</strong> SSB only (no written exam)</div>
+                <div class="entry-detail"><strong>Commission:</strong> Short Service Commission (14 yrs)</div>
+                <div class="entry-detail"><strong>Training:</strong> 49 weeks at IMA/OTA</div>
+            </div>
+            <div class="entry-card">
+                <div class="entry-name">CDS OTA (SSC)</div>
+                <div class="entry-detail"><strong>Eligibility:</strong> Graduate any stream, Age 19-25 yrs</div>
+                <div class="entry-detail"><strong>Process:</strong> UPSC CDS → SSB → Medical</div>
+                <div class="entry-detail"><strong>Commission:</strong> Short Service Commission (14 yrs), option for PC</div>
+                <div class="entry-detail"><strong>Training:</strong> 11 months at OTA Chennai</div>
+            </div>
+            <div class="entry-card">
+                <div class="entry-name">Agniveer (Army)</div>
+                <div class="entry-detail"><strong>Eligibility:</strong> 10th/12th pass (varies by trade), Age 17.5-21 yrs</div>
+                <div class="entry-detail"><strong>Process:</strong> Written + Physical + Medical</div>
+                <div class="entry-detail"><strong>Commission:</strong> 4-year contract, 25% retained</div>
+                <div class="entry-detail"><strong>Pay:</strong> Rs 30,000–40,000/month + Seva Nidhi</div>
+            </div>
+        </div>
+        <div class="rank-progression">
+            <h3>📈 Army Officer Rank Progression</h3>
+            <div class="rank-ladder">
+                <div class="rank-step">2nd Lt <span>0-1 yr</span></div>→
+                <div class="rank-step">Lt <span>2 yrs</span></div>→
+                <div class="rank-step">Capt <span>6 yrs</span></div>→
+                <div class="rank-step">Major <span>13 yrs</span></div>→
+                <div class="rank-step">Lt Col <span>17 yrs</span></div>→
+                <div class="rank-step">Col <span>26 yrs</span></div>→
+                <div class="rank-step">Brig <span>sel.</span></div>→
+                <div class="rank-step">Maj Gen+</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVY -->
+    <div id="service-navy" class="service-section" style="display:none">
+        <div class="service-hero navy-hero">
+            <h2>🚢 Indian Navy — Entry Routes</h2>
+            <p>Protecting 7,516 km coastline | 67,000+ personnel</p>
+        </div>
+        <div class="entries-grid">
+            <div class="entry-card">
+                <div class="entry-name">NDA (Naval Wing)</div>
+                <div class="entry-detail"><strong>Eligibility:</strong> 10+2 with Physics & Maths, Age 16.5-19.5 yrs</div>
+                <div class="entry-detail"><strong>Process:</strong> UPSC NDA → SSB → Medical</div>
+                <div class="entry-detail"><strong>Commission:</strong> Permanent Commission as Sub Lieutenant</div>
+                <div class="entry-detail"><strong>Training:</strong> 3 yrs NDA + 3 yrs INA Ezhimala</div>
+            </div>
+            <div class="entry-card">
+                <div class="entry-name">CDS (INA Entry)</div>
+                <div class="entry-detail"><strong>Eligibility:</strong> BE/B.Tech Engineering Graduate</div>
+                <div class="entry-detail"><strong>Process:</strong> UPSC CDS → SSB → Medical</div>
+                <div class="entry-detail"><strong>Commission:</strong> Permanent Commission</div>
+                <div class="entry-detail"><strong>Training:</strong> 3 years at INA Ezhimala, Kerala</div>
+            </div>
+            <div class="entry-card">
+                <div class="entry-name">Agniveer (Navy)</div>
+                <div class="entry-detail"><strong>Eligibility:</strong> 10+2 with PCM (for technical), Age 17.5-21 yrs</div>
+                <div class="entry-detail"><strong>Process:</strong> Written + Physical Fitness Test + Medical</div>
+                <div class="entry-detail"><strong>Trades:</strong> Senior Secondary Recruit (SSR), Matric Recruit (MR)</div>
+                <div class="entry-detail"><strong>Pay:</strong> Rs 30,000–40,000/month</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AIR FORCE -->
+    <div id="service-airforce" class="service-section" style="display:none">
+        <div class="service-hero af-hero">
+            <h2>✈️ Indian Air Force — Entry Routes</h2>
+            <p>4th largest air force | 1.4 lakh+ personnel | 900+ aircraft</p>
+        </div>
+        <div class="entries-grid">
+            <div class="entry-card">
+                <div class="entry-name">NDA (Air Force Wing)</div>
+                <div class="entry-detail"><strong>Eligibility:</strong> 10+2 with Physics & Maths, Age 16.5-19.5 yrs</div>
+                <div class="entry-detail"><strong>Process:</strong> UPSC NDA → AFSB → Medical (Pilot standard)</div>
+                <div class="entry-detail"><strong>Commission:</strong> Permanent Commission as Flying Officer</div>
+                <div class="entry-detail"><strong>Training:</strong> 3 yrs NDA + 74 weeks AFA Dundigal</div>
+            </div>
+            <div class="entry-card">
+                <div class="entry-name">AFCAT (Flying Branch)</div>
+                <div class="entry-detail"><strong>Eligibility:</strong> Graduate with PCM at 10+2, Age 20-24 yrs</div>
+                <div class="entry-detail"><strong>Process:</strong> AFCAT written + AFSB + Medical</div>
+                <div class="entry-detail"><strong>Commission:</strong> Permanent Commission (Flying)</div>
+                <div class="entry-detail"><strong>Training:</strong> 74 weeks at Air Force Academy</div>
+            </div>
+            <div class="entry-card">
+                <div class="entry-name">AFCAT (Technical/Ground Duty)</div>
+                <div class="entry-detail"><strong>Eligibility:</strong> Engineering graduate / relevant degree, Age 20-26 yrs</div>
+                <div class="entry-detail"><strong>Process:</strong> AFCAT + EKT (for technical) + AFSB</div>
+                <div class="entry-detail"><strong>Branches:</strong> Aeronautical Engg (M), Aeronautical Engg (E), Admin, Accounts, Education, Logistics, Met</div>
+                <div class="entry-detail"><strong>Commission:</strong> Permanent/Short Service Commission</div>
+            </div>
+            <div class="entry-card">
+                <div class="entry-name">Agniveer Vayu</div>
+                <div class="entry-detail"><strong>Eligibility:</strong> 10+2 (Science/Arts/Commerce based on trade), Age 17.5-21 yrs</div>
+                <div class="entry-detail"><strong>Process:</strong> Written exam + Physical + Medical</div>
+                <div class="entry-detail"><strong>Trades:</strong> Science (Technical), Science (Non-Tech), Others</div>
+                <div class="entry-detail"><strong>Pay:</strong> Rs 30,000–40,000/month</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Study Planner -->
+    <div class="study-planner-section">
+        <h2>📅 Generate Study Plan</h2>
+        <div class="planner-form">
+            <div class="form-group">
+                <label>Target Exam</label>
+                <select id="planExam" class="form-input">
+                    <option value="NDA">NDA</option>
+                    <option value="CDS">CDS</option>
+                    <option value="AFCAT">AFCAT</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Months Available</label>
+                <input type="number" id="planMonths" class="form-input" value="6" min="1" max="24">
+            </div>
+            <div class="form-group">
+                <label>Daily Study Hours</label>
+                <input type="number" id="planHours" class="form-input" value="4" min="1" max="12" step="0.5">
+            </div>
+            <button class="btn btn-primary" onclick="generatePlan()">📋 Generate My Plan</button>
+        </div>
+        <div id="studyPlanResult" style="display:none" class="plan-result">
+            <h3>Your Personalized Study Plan</h3>
+            <div id="planContent"></div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script>
+function showService(service) {
+    ['army', 'navy', 'airforce'].forEach(s => {
+        document.getElementById('service-' + s).style.display = 'none';
+        document.getElementById('tab-' + s).classList.remove('active');
+    });
+    document.getElementById('service-' + service).style.display = 'block';
+    document.getElementById('tab-' + service).classList.add('active');
+}
+
+function generatePlan() {
+    const exam = document.getElementById('planExam').value;
+    const months = document.getElementById('planMonths').value;
+    const hours = document.getElementById('planHours').value;
+
+    fetch('/api/study_plan', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({exam, months: parseInt(months), hours: parseFloat(hours)})
+    })
+    .then(r => r.json())
+    .then(plan => {
+        let html = `<div class="plan-overview">
+            <strong>Exam:</strong> ${plan.exam} | <strong>Duration:</strong> ${plan.duration_months} months | <strong>Daily:</strong> ${plan.daily_hours} hrs
+        </div>`;
+
+        html += '<div class="plan-subjects"><h4>📚 Subjects to Cover</h4><ul>';
+        plan.subjects.forEach(s => html += `<li>${s}</li>`);
+        html += '</ul></div>';
+
+        html += '<div class="plan-monthly"><h4>📅 Monthly Plan</h4>';
+        plan.monthly_plan.forEach(m => html += `<div class="plan-month-item">📌 ${m}</div>`);
+        html += '</div>';
+
+        html += '<div class="plan-daily"><h4>⏰ Daily Schedule</h4>';
+        for (const [time, activity] of Object.entries(plan.daily_schedule)) {
+            html += `<div class="schedule-item"><span class="schedule-time">${time}:</span> ${activity}</div>`;
+        }
+        html += '</div>';
+
+        html += `<div class="plan-tip">💡 ${plan.tip}</div>`;
+
+        document.getElementById('planContent').innerHTML = html;
+        document.getElementById('studyPlanResult').style.display = 'block';
+        document.getElementById('studyPlanResult').scrollIntoView({behavior: 'smooth'});
+    });
+}
+</script>
+{% endblock %}
